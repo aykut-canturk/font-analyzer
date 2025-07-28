@@ -30,6 +30,11 @@ def create_argument_parser() -> argparse.ArgumentParser:
     parser.add_argument("--font_path", help="Path to a single font file")
     parser.add_argument("--whitelist_path", help="Path to custom whitelist file")
     parser.add_argument(
+        "--allowed_fonts",
+        nargs="*",
+        help="List of allowed font patterns (can use regex patterns)",
+    )
+    parser.add_argument(
         "--verify-ssl",
         type=int,
         choices=[0, 1],
@@ -49,6 +54,7 @@ def main() -> int:
         env_url = os.getenv("URL")
         env_font_path = os.getenv("FONT_PATH")
         env_whitelist_path = os.getenv("WHITELIST_PATH")
+        env_allowed_fonts = os.getenv("ALLOWED_FONTS")
 
         if env_url:
             args.url = env_url
@@ -58,6 +64,12 @@ def main() -> int:
         if env_whitelist_path and not args.whitelist_path:
             args.whitelist_path = env_whitelist_path
 
+        # Parse allowed fonts from environment variable (comma-separated)
+        if env_allowed_fonts and not args.allowed_fonts:
+            args.allowed_fonts = [
+                font.strip() for font in env_allowed_fonts.split(",") if font.strip()
+            ]
+
     # Update SSL verification setting based on argument
     settings.HTTP_VERIFY_SSL = bool(args.verify_ssl)
 
@@ -66,14 +78,15 @@ def main() -> int:
         parser.print_help()
         print("\nError: Either provide --font_path or --url to scrape from a website.")
         print("You can also set URL or FONT_PATH environment variables.")
+        print("\nAdditional options:")
+        print("  --allowed_fonts: Specify allowed font patterns directly as parameters")
+        print("  ALLOWED_FONTS: Environment variable for comma-separated allowed fonts")
         return 1
 
     # Initialize font analyzer
-    analyzer = FontAnalyzer(whitelist_path=args.whitelist_path)
-
-    # Log whitelist status
-    pattern_count = analyzer.whitelist_pattern_count
-    log(f"Loaded {pattern_count} allowed font patterns")
+    analyzer = FontAnalyzer(
+        whitelist_path=args.whitelist_path, allowed_fonts=args.allowed_fonts
+    )
 
     try:
         results = []

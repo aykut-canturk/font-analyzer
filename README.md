@@ -32,6 +32,9 @@ font-analyzer --url "https://github.com"
 font-analyzer --url "https://github.com" --whitelist_path "./whitelist.yaml"
 font-analyzer --font_path "/path/to/Roboto-Regular.ttf"
 font-analyzer --font_path "/path/to/Roboto-Regular.ttf" --whitelist_path "/path/to/whitelist.yaml"
+# Directly allow fonts by name or regex
+font-analyzer --font_path "/path/to/font.ttf" --allowed_fonts "Roboto" "Open Sans" ".*Arial.*"
+font-analyzer --url "https://github.com" --allowed_fonts "Roboto" "Open Sans" ".*Arial.*"
 ```
 
 ### ⚡ Method 2: UV Development Environment (Fast)
@@ -52,6 +55,8 @@ uv sync
 # Run with UV
 uv run python -m font_analyzer.main --url "https://github.com"
 uv run python -m font_analyzer.main --font_path "/path/to/Roboto-Regular.ttf"
+uv run python -m font_analyzer.main --font_path "/path/to/font.ttf" --allowed_fonts "Roboto" "Open Sans" ".*Arial.*"
+uv run python -m font_analyzer.main --url "https://github.com" --allowed_fonts "Roboto" "Open Sans" ".*Arial.*"
 ```
 
 
@@ -66,6 +71,9 @@ docker run --rm font-analyzer --url "https://github.com"
 
 # With local fonts
 docker run --rm -v "/path/to/fonts:/app/fonts" font-analyzer --font_path "/app/fonts/Roboto-Regular.ttf"
+# With allowed fonts
+docker run --rm font-analyzer --url "https://github.com" --allowed_fonts "Roboto" "Open Sans" ".*Arial.*"
+docker run --rm -v "/path/to/fonts:/app/fonts" font-analyzer --font_path "/app/fonts/Roboto-Regular.ttf" --allowed_fonts "Roboto" "Open Sans" ".*Arial.*"
 ```
 
 ### 🐍 Method 4: Traditional Python (Legacy)
@@ -85,6 +93,7 @@ pip install -e .
 
 # Run
 font-analyzer --url "https://github.com"
+font-analyzer --url "https://github.com" --allowed_fonts "Roboto" "Open Sans" ".*Arial.*"
 ```
 
 ## 🚀 Features & Capabilities
@@ -143,7 +152,7 @@ uv sync
 uv run python -m font_analyzer.main --help
 ```
 
-### � Method 3: Docker Deployment
+### 🐳 Method 3: Docker Deployment
 
 **Best for**: Production environments and CI/CD
 
@@ -175,69 +184,48 @@ font-analyzer --help
 
 ---
 
-## � Usage Examples & Scenarios
+## 📚 Usage Examples & Scenarios
 
 ### 🌐 Website Font Analysis
 
 ```bash
 # Basic website analysis (Global Installation)
 font-analyzer --url "https://github.com"
+font-analyzer --url "https://github.com" --allowed_fonts "Roboto" "Open Sans" ".*Arial.*"
 
 # With UV environment
-uv run python -m font_analyzer.main --url "https://github.com"
+uv run python -m font_analyzer.main --url "https://github.com" --allowed_fonts "Roboto" "Open Sans" ".*Arial.*"
 
 # With custom whitelist
-font-analyzer --url "https://github.com" --whitelist_path "/path/to/whitelist.yaml"
+font-analyzer --url "https://github.com" --whitelist_path "/path/to/whitelist.yaml" --allowed_fonts "Roboto" "Open Sans" ".*Arial.*"
 ```
 
 ### 📁 Local Font File Analysis
 
 ```bash
 # Single font analysis (Global Installation)
-font-analyzer --font_path "/path/to/fontfile"
+font-analyzer --font_path "/path/to/fontfile" --allowed_fonts "Roboto" "Open Sans" ".*Arial.*"
 
 # With custom whitelist policy
-font-analyzer --font_path "/path/to/fontfile" --whitelist_path "/path/to/whitelist.yaml"
+font-analyzer --font_path "/path/to/fontfile" --whitelist_path "/path/to/whitelist.yaml" --allowed_fonts "Roboto" "Open Sans" ".*Arial.*"
 
 # With UV environment
-uv run python -m font_analyzer.main --font_path "/path/to/fontfile"
+uv run python -m font_analyzer.main --font_path "/path/to/fontfile" --allowed_fonts "Roboto" "Open Sans" ".*Arial.*"
 ```
 
 ### 🐳 Docker Usage Examples
 
 ```bash
 # Website analysis with Docker
-docker run --rm font-analyzer --url "https://github.com"
+docker run --rm font-analyzer --url "https://github.com" --allowed_fonts "Roboto" "Open Sans" ".*Arial.*"
 
 # Local file analysis with volume mount
-docker run --rm -v /path/to/fonts:/app/fonts" font-analyzer --font_path "/path/to/fontfile"
+docker run --rm -v /path/to/fonts:/app/fonts font-analyzer --font_path "/path/to/fontfile" --allowed_fonts "Roboto" "Open Sans" ".*Arial.*"
 
 # Custom whitelist with Docker
 docker run --rm \
   -v "./custom-whitelist.yaml:/app/whitelist.yaml" \
-  font-analyzer --url "https://github.com" --whitelist_path "/app/whitelist.yaml"
-```
-
-### 🏗️ Docker Compose Scenarios
-
-```yaml
-# docker-compose.yml
-version: '3.8'
-services:
-  font-analyzer:
-    build: .
-    volumes:
-      - ./fonts:/app/fonts
-      - ./logs:/app/logs
-      - ./my-whitelist.yaml:/app/whitelist.yaml
-    environment:
-      - URL=https://github.com
-      # Alternative: - FONT_PATH=/path/to/fontfile
-```
-
-```bash
-# Run with compose
-docker-compose up font-analyzer
+  font-analyzer --url "https://github.com" --whitelist_path "/app/whitelist.yaml" --allowed_fonts "Roboto" "Open Sans" ".*Arial.*"
 ```
 
 ### 🔧 Environment Variable Usage
@@ -247,62 +235,15 @@ docker-compose up font-analyzer
 set URL=https://github.com
 set WHITELIST_PATH=/path/to/whitelist.yaml
 set FONT_PATH=/path/to/fontfile
+set ALLOWED_FONTS=Roboto,Open Sans,.*Arial.*
 font-analyzer
 
 # Set environment variables (Linux/macOS)
 export URL=https://github.com
 export WHITELIST_PATH=/tmp/whitelist.yaml
 export FONT_PATH=/path/to/fontfile
+export ALLOWED_FONTS=Roboto,Open Sans,.*Arial.*
 font-analyzer
-```
-
----
-
-## 🛠️ Development & Maintenance
-
-### UV Development Commands (Recommended)
-
-```bash
-# Setup complete development environment
-uv sync
-
-# Code quality and formatting
-uv run black src tests                                                  # Format code
-uv run flake8 src tests --max-line-length=88 --extend-ignore=E203,W503  # Lint code
-uv run mypy src                                                         # Type checking
-
-# Testing and validation
-uv run python -m unittest tests.test_font_analyzer -v                   # Run tests
-uv run pytest tests/ -v --cov=src --cov-report=html                     # Test with coverage
-
-# Dependency management
-uv add package-name                                                     # Add production dependency
-uv add --dev pytest-cov                                                 # Add development dependency
-uv sync --upgrade                                                       # Update all dependencies
-```
-
-### Windows Development Scripts
-
-```cmd
-# Development environment
-scripts\dev.bat install-dev        # Install dev dependencies
-scripts\dev.bat dev-check          # Run all quality checks
-scripts\dev.bat format             # Format code with black
-scripts\dev.bat lint               # Run linting checks
-scripts\dev.bat type-check         # Run type checking
-scripts\dev.bat test               # Execute test suite
-scripts\dev.bat clean              # Clean build artifacts
-```
-
-### Cross-Platform Make Commands
-
-```bash
-# Quality assurance
-make install-dev                   # Install development dependencies
-make quality                       # Run all quality checks
-make quality-fix                   # Format and fix code issues
-make test-cov                      # Run tests with coverage report
-make clean                         # Clean temporary files
 ```
 
 ---
@@ -316,6 +257,7 @@ make clean                         # Clean temporary files
 | `URL` | Website URL to analyze | `https://github.com` |
 | `FONT_PATH` | Path to font file | `./fonts/font.woff` |
 | `WHITELIST_PATH` | Custom whitelist file | `/app/custom-whitelist.yaml` |
+| `ALLOWED_FONTS` | Comma-separated list of allowed font patterns | `Roboto,Open Sans,.*Arial.*` |
 
 ### Whitelist Configuration
 
