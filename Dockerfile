@@ -4,29 +4,23 @@ FROM python:3.13-slim
 # Set working directory
 WORKDIR /app
 
-# Update system packages and install required packages
-RUN apt-get update && apt-get install -y \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
-
 # Install uv
-RUN pip install uv
+RUN pip install --no-cache-dir uv
 
-# Copy pyproject.toml, uv.lock, and README.md for dependency installation
-COPY pyproject.toml uv.lock README.md ./
+# Copy all required files before installing dependencies
+COPY pyproject.toml uv.lock ./
+COPY src/ ./src/
 
-# Install dependencies with uv
-RUN uv sync --frozen --no-dev --no-native-tls
+# Sync dependencies (installs them into system, uv creates virtualenv internally)
+RUN uv sync
 
-# Copy application files
-COPY . .
-
-# Set Python path to src directory
+# Set environment variables
 ENV PYTHONPATH="/app/src"
+ENV PYTHONUNBUFFERED=1
 ENV LOG_DIR="/app/logs"
 
-# Create fonts and logs directories
-RUN mkdir -p fonts logs
+# Create required directories
+RUN mkdir -p /app/fonts /app/logs
 
-# Default command - parameters are passed directly to python main.py
+# Default command
 ENTRYPOINT ["uv", "run", "python", "-m", "font_analyzer.main"]
