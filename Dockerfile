@@ -11,7 +11,7 @@ RUN pip install --no-cache-dir uv
 COPY pyproject.toml uv.lock ./
 COPY src/ ./src/
 
-# Sync dependencies (installs them into system, uv creates virtualenv internally)
+# Sync dependencies using uv
 RUN uv sync
 
 # Set environment variables
