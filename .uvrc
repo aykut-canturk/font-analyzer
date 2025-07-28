@@ -1,0 +1,11 @@
+# UV configuration file for font-analyzer
+# This file configures UV behavior for this project
+
+# Install packages in development mode by default
+dev = true
+
+# Use a local virtual environment
+virtual-env = ".venv"
+
+# Show progress during installs
+progress = true

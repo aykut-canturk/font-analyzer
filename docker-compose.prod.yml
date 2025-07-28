@@ -1,0 +1,12 @@
+services:
+  font-analyzer:
+    image: ghcr.io/aykut-canturk/font-analyzer
+    volumes:
+      # Mount the fonts directory from host to container
+      - ./fonts:/app/fonts
+      # Persist logs directory on the host (mount as directory, not file)
+      - ./logs:/app/logs
+      # Mount whitelist file from project root (can be replaced externally)
+      - ./whitelist.yaml:/app/whitelist.yaml
+    environment:
+      - PYTHONUNBUFFERED=1

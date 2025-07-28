@@ -1,0 +1,117 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Font Analyzer - URL (Current)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "font_analyzer.main",
+      "justMyCode": true,
+      "cwd": "${workspaceFolder}/src",
+      "args": [
+        "--url",
+        "https://github.com/"
+      ],
+      "console": "integratedTerminal",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/src"
+      }
+    },
+    {
+      "name": "Python: Font Analyzer - Custom URL",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "font_analyzer.main",
+      "justMyCode": true,
+      "cwd": "${workspaceFolder}/src",
+      "args": [
+        "--url",
+        "${input:websiteUrl}"
+      ],
+      "console": "integratedTerminal",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/src"
+      }
+    },
+    {
+      "name": "Python: Font Analyzer - Local Font File",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "font_analyzer.main",
+      "justMyCode": true,
+      "cwd": "${workspaceFolder}/src",
+      "args": [
+        "--font_path",
+        "${workspaceFolder}/fonts/AkzidenzGrotesk-Regular.woff2"
+      ],
+      "console": "integratedTerminal",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/src"
+      }
+    },
+    {
+      "name": "Python: Font Analyzer - Custom Font File",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "font_analyzer.main",
+      "justMyCode": true,
+      "cwd": "${workspaceFolder}/src",
+      "args": [
+        "--font_path",
+        "${input:fontFilePath}"
+      ],
+      "console": "integratedTerminal",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/src"
+      }
+    },
+    {
+      "name": "Python: Font Analyzer - With Custom Whitelist",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "font_analyzer.main",
+      "justMyCode": true,
+      "cwd": "${workspaceFolder}/src",
+      "args": [
+        "--url",
+        "https://github.com/",
+        "--whitelist_path",
+        "${workspaceFolder}/whitelist.yaml"
+      ],
+      "console": "integratedTerminal",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/src"
+      }
+    },
+    {
+      "name": "Python: Debug All Code",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "font_analyzer.main",
+      "justMyCode": false,
+      "cwd": "${workspaceFolder}/src",
+      "args": [
+        "--url",
+        "https://github.com/"
+      ],
+      "console": "integratedTerminal",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/src"
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "websiteUrl",
+      "description": "Enter the website URL to analyze",
+      "default": "https://github.com",
+      "type": "promptString"
+    },
+    {
+      "id": "fontFilePath",
+      "description": "Enter the path to the font file",
+      "default": "${workspaceFolder}/fonts/",
+      "type": "promptString"
+    }
+  ]
+}
