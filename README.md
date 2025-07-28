@@ -2,7 +2,6 @@
 
 > **Professional font analysis and compliance validation tool**
 
-[![Python Version](https://img.shields.io/badge/python-### 🐳 Method 3: Docker Deployment.8.1+-blue.svg)](https://python.org)
 [![UV](https://img.shields.io/badge/dependency--manager-UV-orange.svg)](https://docs.astral.sh/uv/)
 [![Docker](https://img.shields.io/badge/docker-supported-blue.svg)](https://docker.com)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
