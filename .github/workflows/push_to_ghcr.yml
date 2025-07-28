@@ -5,6 +5,7 @@ on:
       - main
     paths:
       - "src/**"
+      - "Dockerfile"
 
 jobs:
   build_and_push:
