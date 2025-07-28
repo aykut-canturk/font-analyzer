@@ -44,8 +44,15 @@ class FontSummary(NamedTuple):
 class FontAnalyzer:
     """Main class for analyzing fonts and validating against whitelist."""
 
-    def __init__(self, max_workers: int = 4, whitelist_path: Optional[str] = None):
-        self.whitelist_manager = WhitelistManager(whitelist_path=whitelist_path)
+    def __init__(
+        self,
+        max_workers: int = 4,
+        whitelist_path: Optional[str] = None,
+        allowed_fonts: Optional[List[str]] = None,
+    ):
+        self.whitelist_manager = WhitelistManager(
+            whitelist_path=whitelist_path, allowed_fonts=allowed_fonts
+        )
         self.metadata_extractor = FontMetadataExtractor()
         self.web_scraper = WebScraper()
         self.font_downloader = FontDownloader()
@@ -62,7 +69,7 @@ class FontAnalyzer:
             )
 
             # Perform analysis
-            result = self._analyze_font_file_internal(font_path)
+            result = self._analyze_single_font(font_path)
 
             # Add timing and size information
             result.file_size = file_size
@@ -310,19 +317,16 @@ class FontAnalyzer:
                 else ""
             )
             log(
-                f"\n=== Metadata for {result.font_name} ({display_name}) === {status}{pattern_info}{Style.RESET_ALL}"
+                f"\n=== Metadata for {result.font_name} ({display_name}) === {status}{pattern_info}{Style.RESET_ALL}",
+                level="debug",
             )
         else:
             status = f"{Fore.RED}✗ NOT ALLOWED"
             log(
-                f"\n=== Metadata for {result.font_name} ({display_name}) === {status}{Style.RESET_ALL}"
+                f"\n=== Metadata for {result.font_name} ({display_name}) === {status}{Style.RESET_ALL}",
+                level="debug",
             )
 
         # Log metadata
         for name_id, value in result.metadata.items():
-            log(f"NameID {name_id}: {value}")
-
-    @property
-    def whitelist_pattern_count(self) -> int:
-        """Get the number of loaded whitelist patterns."""
-        return self.whitelist_manager.pattern_count
+            log(f"NameID {name_id}: {value}", level="debug")

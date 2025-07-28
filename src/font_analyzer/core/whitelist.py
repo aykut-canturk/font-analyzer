@@ -17,9 +17,24 @@ from font_analyzer.utils.logger import log
 class WhitelistManager:
     """Manages font whitelist patterns and validation."""
 
-    def __init__(self, whitelist_path: Optional[str] = None):
+    def __init__(
+        self,
+        whitelist_path: Optional[str] = None,
+        allowed_fonts: Optional[List[str]] = None,
+    ):
         self._allowed_patterns: List[str] = []
         self._load_whitelist(whitelist_path)
+
+        # Add patterns from direct array parameter
+        if allowed_fonts:
+            self._add_patterns_from_array(allowed_fonts)
+
+        # Log all loaded patterns
+        if self._allowed_patterns:
+            log(
+                f"Loaded {len(self._allowed_patterns)} whitelist patterns: "
+                f"{', '.join(self._allowed_patterns)}"
+            )
 
     def _load_whitelist(self, custom_path: Optional[str] = None) -> None:
         """Load whitelist patterns from configuration files."""
@@ -39,9 +54,7 @@ class WhitelistManager:
 
         if pkg_resources.is_resource("font_analyzer", "whitelist.yaml"):
             # Load from package resource if available
-            with pkg_resources.open_text(
-                "font_analyzer", "whitelist.yaml"
-            ) as f:
+            with pkg_resources.open_text("font_analyzer", "whitelist.yaml") as f:
                 self._load_from_file(f.name)
             log(
                 "Whitelist loaded from package resource: "
@@ -79,6 +92,25 @@ class WhitelistManager:
         except Exception as e:
             log(f"Error loading whitelist from {file_path}: {e}", level="error")
             self._allowed_patterns = []
+
+    def _add_patterns_from_array(self, allowed_fonts: List[str]) -> None:
+        """Add patterns from an array of allowed fonts."""
+        additional_patterns = []
+        for font in allowed_fonts:
+            if not font:
+                continue
+            try:
+                # Test if it's a valid regex pattern
+                re.compile(font)
+                additional_patterns.append(font)
+            except re.error:
+                # If not a valid regex, escape it to be treated as literal text
+                escaped_pattern = re.escape(font)
+                additional_patterns.append(escaped_pattern)
+                log(f"Added escaped font pattern from array: {escaped_pattern}")
+
+        # Add to existing patterns
+        self._allowed_patterns.extend(additional_patterns)
 
     def is_font_allowed(self, font_name: str) -> bool:
         """
