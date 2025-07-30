@@ -20,10 +20,13 @@ from font_analyzer.utils.logger import log
 class WebScraper:
     """Handles web scraping operations for font detection."""
 
-    def __init__(self, timeout: int = HTTP_TIMEOUT, verify_ssl: bool = None):
+    def __init__(self, timeout: int = HTTP_TIMEOUT, verify_ssl: bool | None = None):
         self.timeout = timeout
-        # If verify_ssl is not explicitly provided, get current value from settings
-        self.verify_ssl = verify_ssl if verify_ssl is not None else settings.HTTP_VERIFY_SSL
+        # If verify_ssl is not explicitly provided, get current value
+        # from settings
+        self.verify_ssl = (
+            verify_ssl if verify_ssl is not None else settings.HTTP_VERIFY_SSL
+        )
         self._url_pattern = re.compile(r"url\(([^)]+)\)")
 
     def fetch_html(self, url: str) -> str:
@@ -42,7 +45,7 @@ class WebScraper:
         try:
             response = requests.get(url, verify=self.verify_ssl, timeout=self.timeout)
             response.raise_for_status()
-            return response.text
+            return str(response.text)
         except requests.RequestException as e:
             log(f"Error fetching HTML from {url}: {e}", level="error")
             raise
@@ -82,21 +85,21 @@ class WebScraper:
         return [style_tag.get_text() for style_tag in soup.find_all("style")]
 
     def extract_font_urls_from_css(
-        self, css_texts: List[str], base_url: str
+        self, css_content_with_urls: List[tuple[str, str]]
     ) -> Set[str]:
         """
-        Extract font URLs from CSS content.
+        Extract font URLs from CSS content using proper relative path 
+        resolution.
 
         Args:
-            css_texts: List of CSS content strings
-            base_url: Base URL for resolving relative URLs
+            css_content_with_urls: List of tuples (css_content, css_file_url)
 
         Returns:
             Set of absolute font URLs
         """
         font_urls = set()
 
-        for css_text in css_texts:
+        for css_text, css_file_url in css_content_with_urls:
             matches = self._url_pattern.findall(css_text)
             for match in matches:
                 font_url = match.strip("\"' ")
@@ -106,20 +109,22 @@ class WebScraper:
                     font_url.lower().endswith(ext) for ext in SUPPORTED_FONT_EXTENSIONS
                 ):
                     if not font_url.startswith("http"):
-                        font_url = urljoin(base_url, font_url)
+                        # Use the CSS file's URL as base, not main page URL
+                        font_url = urljoin(css_file_url, font_url)
                     font_urls.add(font_url)
 
         return font_urls
 
-    def get_all_css_content(self, url: str) -> List[str]:
+    def get_all_css_content(self, url: str) -> List[tuple[str, str]]:
         """
-        Get all CSS content from a webpage (both linked and inline).
+        Get all CSS content from a webpage (both linked and inline) with 
+        corresponding CSS file URLs.
 
         Args:
             url: The webpage URL
 
         Returns:
-            List of CSS content strings
+            List of tuples (css_content, css_file_url)
         """
         # Fetch HTML
         html_content = self.fetch_html(url)
@@ -128,28 +133,33 @@ class WebScraper:
         # Get CSS URLs
         css_urls = self.extract_css_links(soup, url)
 
-        # Fetch CSS content
-        all_css_contents = []
+        # Fetch CSS content and create tuples
+        css_content_with_urls = []
         for css_url in css_urls:
             try:
                 css_content = self.fetch_html(css_url)
-                all_css_contents.append(css_content)
+                css_content_with_urls.append((css_content, css_url))
             except Exception as e:
                 log(f"Error fetching CSS from {css_url}: {e}", level="error")
 
-        # Add inline CSS
-        all_css_contents.extend(self.extract_inline_css(soup))
+        # Add inline CSS (use the main page URL as base)
+        inline_css = self.extract_inline_css(soup)
+        for css_content in inline_css:
+            css_content_with_urls.append((css_content, url))
 
-        return all_css_contents
+        return css_content_with_urls
 
 
 class FontDownloader:
     """Handles font file downloading operations."""
 
-    def __init__(self, timeout: int = HTTP_TIMEOUT, verify_ssl: bool = None):
+    def __init__(self, timeout: int = HTTP_TIMEOUT, verify_ssl: bool | None = None):
         self.timeout = timeout
-        # If verify_ssl is not explicitly provided, get current value from settings
-        self.verify_ssl = verify_ssl if verify_ssl is not None else settings.HTTP_VERIFY_SSL
+        # If verify_ssl is not explicitly provided, get current value
+        # from settings
+        self.verify_ssl = (
+            verify_ssl if verify_ssl is not None else settings.HTTP_VERIFY_SSL
+        )
 
     def download_font_files(
         self, font_urls: Set[str], download_folder: str
@@ -164,11 +174,10 @@ class FontDownloader:
         Returns:
             List of paths to successfully downloaded files
         """
-        if not os.path.exists(download_folder):
-            os.makedirs(download_folder)
-
         downloaded_files = []
 
+        # Ensure download folder exists
+        os.makedirs(download_folder, exist_ok=True)
         for font_url in font_urls:
             font_name = self._get_filename_from_url(font_url)
             font_path = os.path.join(download_folder, font_name)
@@ -188,7 +197,7 @@ class FontDownloader:
                     f.write(response.content)
 
                 downloaded_files.append(font_path)
-                log(f"Downloaded: {font_name}")
+                log(f"Downloaded: {font_name}", level="debug")
 
             except requests.RequestException as e:
                 log(f"Error downloading font from {font_url}: {e}", level="error")
