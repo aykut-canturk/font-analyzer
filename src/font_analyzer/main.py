@@ -41,6 +41,11 @@ def create_argument_parser() -> argparse.ArgumentParser:
         default=1,
         help="Enable SSL verification for HTTP requests (1=enabled, 0=disabled, default=1)",
     )
+    parser.add_argument(
+        "--verbose", "-v",
+        action="store_true",
+        help="Enable verbose debug logging",
+    )
     return parser
 
 
@@ -72,6 +77,15 @@ def main() -> int:
 
     # Update SSL verification setting based on argument
     settings.HTTP_VERIFY_SSL = bool(args.verify_ssl)
+    
+    # Enable verbose logging if requested
+    if args.verbose:
+        import logging
+        logger = logging.getLogger("font_analyzer")
+        logger.setLevel(logging.DEBUG)
+        for handler in logger.handlers:
+            handler.setLevel(logging.DEBUG)
+        log("Debug logging enabled", level="debug")
 
     # Validate arguments
     if not args.url and not args.font_path:

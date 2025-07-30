@@ -140,11 +140,13 @@ class FontAnalyzer:
         log(f"Scraping fonts from URL: {url}")
 
         try:
-            # Get all CSS content
-            css_contents = self.web_scraper.get_all_css_content(url)
+            # Get all CSS content with URLs
+            css_content_with_urls = self.web_scraper.get_all_css_content(url)
 
             # Extract font URLs
-            font_urls = self.web_scraper.extract_font_urls_from_css(css_contents, url)
+            font_urls = self.web_scraper.extract_font_urls_from_css(
+                css_content_with_urls
+            )
 
             if not font_urls:
                 log("No font URLs found in CSS")
