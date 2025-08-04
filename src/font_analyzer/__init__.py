@@ -2,7 +2,7 @@
 Font Detector Package - Core functionality for font analysis and validation.
 """
 
-__version__ = "0.0.1"
+__version__ = "0.0.4"
 __author__ = "Aykut Cantürk"
 __description__ = "A tool for detecting and validating fonts from websites and files"
 
