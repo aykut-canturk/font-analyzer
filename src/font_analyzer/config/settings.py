@@ -13,14 +13,6 @@ else:
     # tmp folder for local development
     DEFAULT_DOWNLOAD_FOLDER = os.path.join(tempfile.gettempdir(), "font-analyzer-fonts")
 
-
-# Default whitelist file paths (in order of preference)
-WHITELIST_PATHS = [
-    "/app/src/font_analyzer/whitelist.yaml",  # Whitelist in root (for Docker volume)
-    "font_analyzer/whitelist.yaml",  # Local working directory
-]
-
-
 # Supported font file extensions
 SUPPORTED_FONT_EXTENSIONS = [".woff", ".woff2", ".ttf", ".otf"]
 

@@ -6,7 +6,6 @@ services:
       - ./fonts:/app/fonts
       # Persist logs directory on the host (mount as directory, not file)
       - ./logs:/app/logs
-      # Mount whitelist file from project root (can be replaced externally)
-      - ./whitelist.yaml:/app/whitelist.yaml
     environment:
       - PYTHONUNBUFFERED=1
+      - ALLOWED_FONTS=Roboto,Open Sans,Arial

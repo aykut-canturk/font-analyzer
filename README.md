@@ -29,9 +29,7 @@ pip install -e .
 
 # Run from anywhere on your system
 font-analyzer --url "https://github.com"
-font-analyzer --url "https://github.com" --whitelist_path "./whitelist.yaml"
 font-analyzer --font_path "/path/to/Roboto-Regular.ttf"
-font-analyzer --font_path "/path/to/Roboto-Regular.ttf" --whitelist_path "/path/to/whitelist.yaml"
 # Directly allow fonts by name or regex
 font-analyzer --font_path "/path/to/font.ttf" --allowed_fonts "Roboto" "Open Sans" ".*Arial.*"
 font-analyzer --url "https://github.com" --allowed_fonts "Roboto" "Open Sans" ".*Arial.*"
@@ -196,8 +194,8 @@ font-analyzer --url "https://github.com" --allowed_fonts "Roboto" "Open Sans" ".
 # With UV environment
 uv run python -m font_analyzer.main --url "https://github.com" --allowed_fonts "Roboto" "Open Sans" ".*Arial.*"
 
-# With custom whitelist
-font-analyzer --url "https://github.com" --whitelist_path "/path/to/whitelist.yaml" --allowed_fonts "Roboto" "Open Sans" ".*Arial.*"
+# Using allowed fonts parameters
+font-analyzer --url "https://github.com" --allowed_fonts "Roboto" "Open Sans" ".*Arial.*"
 ```
 
 ### 📁 Local Font File Analysis
@@ -206,8 +204,8 @@ font-analyzer --url "https://github.com" --whitelist_path "/path/to/whitelist.ya
 # Single font analysis (Global Installation)
 font-analyzer --font_path "/path/to/fontfile" --allowed_fonts "Roboto" "Open Sans" ".*Arial.*"
 
-# With custom whitelist policy
-font-analyzer --font_path "/path/to/fontfile" --whitelist_path "/path/to/whitelist.yaml" --allowed_fonts "Roboto" "Open Sans" ".*Arial.*"
+# With allowed fonts parameter
+font-analyzer --font_path "/path/to/fontfile" --allowed_fonts "Roboto" "Open Sans" ".*Arial.*"
 
 # With UV environment
 uv run python -m font_analyzer.main --font_path "/path/to/fontfile" --allowed_fonts "Roboto" "Open Sans" ".*Arial.*"
@@ -222,10 +220,9 @@ docker run --rm font-analyzer --url "https://github.com" --allowed_fonts "Roboto
 # Local file analysis with volume mount
 docker run --rm -v /path/to/fonts:/app/fonts font-analyzer --font_path "/path/to/fontfile" --allowed_fonts "Roboto" "Open Sans" ".*Arial.*"
 
-# Custom whitelist with Docker
+# With allowed fonts using Docker
 docker run --rm \
-  -v "./custom-whitelist.yaml:/app/whitelist.yaml" \
-  font-analyzer --url "https://github.com" --whitelist_path "/app/whitelist.yaml" --allowed_fonts "Roboto" "Open Sans" ".*Arial.*"
+  font-analyzer --url "https://github.com" --allowed_fonts "Roboto" "Open Sans" ".*Arial.*"
 ```
 
 ### 🔧 Environment Variable Usage
@@ -233,14 +230,12 @@ docker run --rm \
 ```bash
 # Set environment variables (Windows)
 set URL=https://github.com
-set WHITELIST_PATH=/path/to/whitelist.yaml
 set FONT_PATH=/path/to/fontfile
 set ALLOWED_FONTS=Roboto,Open Sans,.*Arial.*
 font-analyzer
 
 # Set environment variables (Linux/macOS)
 export URL=https://github.com
-export WHITELIST_PATH=/tmp/whitelist.yaml
 export FONT_PATH=/path/to/fontfile
 export ALLOWED_FONTS=Roboto,Open Sans,.*Arial.*
 font-analyzer
@@ -256,43 +251,7 @@ font-analyzer
 |----------|-------------|---------|
 | `URL` | Website URL to analyze | `https://github.com` |
 | `FONT_PATH` | Path to font file | `./fonts/font.woff` |
-| `WHITELIST_PATH` | Custom whitelist file | `/app/custom-whitelist.yaml` |
 | `ALLOWED_FONTS` | Comma-separated list of allowed font patterns | `Roboto,Open Sans,.*Arial.*` |
-
-### Whitelist Configuration
-
-Create a `whitelist.yaml` file with regex patterns:
-
-```yaml
-# Font Whitelist Configuration
-# Lines starting with # are comments
-
-# Google Fonts (open source)
-roboto                 # Roboto font family
-lato                   # Lato font family  
-ubuntu                 # Ubuntu font family
-montserrat             # Montserrat font family
-opensans|open\s?sans   # Open Sans variations
-source\s?sans\s?pro    # Source Sans Pro
-inter                  # Inter font family
-poppins                # Poppins font family
-
-# System fonts
-arial                  # Arial
-helvetica              # Helvetica
-times|times\s?new\s?roman  # Times/Times New Roman
-georgia                # Georgia
-verdana                # Verdana
-
-# Custom company fonts (customize for your organization)
-mycompany.*            # Company-specific fonts
-brand.*                # Brand fonts
-corporate.*            # Corporate font family
-
-# Icon fonts (if allowed)
-fontawesome|fa         # Font Awesome icons
-glyphicons             # Bootstrap Glyphicons
-```
 
 ---
 
@@ -303,7 +262,6 @@ glyphicons             # Bootstrap Glyphicons
 ```bash
 $ uv run python -m font_analyzer.main --url "https://github.com"
 
-2025-07-18 15:30:12,345 - INFO - Whitelist loaded from: whitelist.yaml
 2025-07-18 15:30:12,346 - INFO - Loaded 12 allowed font patterns
 2025-07-18 15:30:12,347 - INFO - Scraping fonts from URL: https://github.com
 2025-07-18 15:30:13,456 - INFO - Downloaded: Inter-Regular.woff2
@@ -377,13 +335,11 @@ font-analyzer/
 ├── 🐳 Dockerfile                  # Multi-stage Docker build
 ├── 🐳 docker-compose.yml          # Development Docker Compose
 ├── 🐳 docker-compose.prod.yml     # Production Docker Compose
-├── 📄 whitelist.yaml              # Default font policy patterns
 ├── 📁 scripts/
 │   └── ⚙️ dev.bat                 # Windows development utilities
 ├── 📁 src/font_analyzer/          # Main application package
 │   ├── 🐍 __init__.py             # Package initialization
 │   ├── 🐍 main.py                 # CLI entry point & argument parsing
-│   ├── 📘 whitelist.yaml          # Bundled default whitelist
 │   ├── 📁 config/                 # Configuration management
 │   │   ├── 🐍 __init__.py
 │   │   └── 🐍 settings.py         # Application settings & constants

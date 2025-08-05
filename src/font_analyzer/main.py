@@ -28,7 +28,6 @@ def create_argument_parser() -> argparse.ArgumentParser:
         "--url", help="URL of a website to scrape all fonts from (HTML + CSS)"
     )
     parser.add_argument("--font_path", help="Path to a single font file")
-    parser.add_argument("--whitelist_path", help="Path to custom whitelist file")
     parser.add_argument(
         "--allowed_fonts",
         nargs="*",
@@ -58,16 +57,12 @@ def main() -> int:
     if not args.url and not args.font_path:
         env_url = os.getenv("URL")
         env_font_path = os.getenv("FONT_PATH")
-        env_whitelist_path = os.getenv("WHITELIST_PATH")
         env_allowed_fonts = os.getenv("ALLOWED_FONTS")
 
         if env_url:
             args.url = env_url
         elif env_font_path:
             args.font_path = env_font_path
-
-        if env_whitelist_path and not args.whitelist_path:
-            args.whitelist_path = env_whitelist_path
 
         # Parse allowed fonts from environment variable (comma-separated)
         if env_allowed_fonts and not args.allowed_fonts:
@@ -98,9 +93,7 @@ def main() -> int:
         return 1
 
     # Initialize font analyzer
-    analyzer = FontAnalyzer(
-        whitelist_path=args.whitelist_path, allowed_fonts=args.allowed_fonts
-    )
+    analyzer = FontAnalyzer(allowed_fonts=args.allowed_fonts)
 
     try:
         results = []
