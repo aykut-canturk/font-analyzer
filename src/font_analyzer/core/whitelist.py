@@ -37,7 +37,7 @@ class WhitelistManager:
 
         # Log all loaded patterns
         log(
-            f"Loaded {len(self._allowed_patterns)} whitelist patterns: "
+            f"Loaded {len(self._allowed_patterns)} font patterns: "
             f"{', '.join(self._allowed_patterns)}"
         )
 
