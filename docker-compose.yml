@@ -8,13 +8,11 @@ services:
       - ./fonts:/app/fonts
       # Persist logs directory on the host (mount as directory, not file)
       - ./logs:/app/logs
-      # Mount whitelist file from project root (can be replaced externally)
-      - ./whitelist.yaml:/app/whitelist.yaml
     environment:
       - PYTHONUNBUFFERED=1
       # To pass URL as environment variable:
       # - URL=https://www.example.com
       # To pass font file path as environment variable:
       # - FONT_PATH=/app/fonts/example.ttf
-      # To pass whitelist file path as environment variable:
-      # - WHITELIST_PATH=/app/whitelist.yaml
+      # To pass allowed fonts as environment variable:
+      # - ALLOWED_FONTS=Roboto,Open Sans,Arial

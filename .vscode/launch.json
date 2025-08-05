@@ -75,8 +75,9 @@
       "args": [
         "--url",
         "https://github.com/",
-        "--whitelist_path",
-        "${workspaceFolder}/whitelist.yaml"
+        "--allowed_fonts",
+        "Roboto",
+        "Open Sans"
       ],
       "console": "integratedTerminal",
       "env": {

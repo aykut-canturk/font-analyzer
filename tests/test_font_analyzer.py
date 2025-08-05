@@ -9,8 +9,7 @@ import unittest
 import sys
 import os
 from pathlib import Path
-from unittest.mock import patch, mock_open
-import tempfile
+from unittest.mock import patch
 
 # Add src to path for imports
 project_root = Path(__file__).parent.parent
@@ -29,16 +28,22 @@ class TestWhitelistManager(unittest.TestCase):
         """Set up test fixtures before each test method."""
         self.manager = WhitelistManager()
 
-    @patch(
-        "builtins.open", new_callable=mock_open, read_data="roboto\nlato\nopen.*sans"
-    )
-    @patch("os.path.exists")
-    def test_load_whitelist_success(self, mock_exists, mock_file):
-        """Test successful whitelist loading."""
-        mock_exists.return_value = True
-
+    @patch.dict(os.environ, {"ALLOWED_FONTS": "roboto,lato,open.*sans"}, clear=True)
+    def test_load_whitelist_success(self):
+        """Test successful whitelist loading from .env."""
         manager = WhitelistManager()
         self.assertEqual(manager.pattern_count, 3)
+
+    def test_allowed_fonts_parameter(self):
+        """Test initialization with allowed_fonts parameter."""
+        allowed_fonts = ["Roboto", "Open Sans", "Arial.*"]
+        manager = WhitelistManager(allowed_fonts=allowed_fonts)
+        self.assertEqual(manager.pattern_count, 3)
+        
+        # Test that fonts are properly allowed
+        self.assertTrue(manager.is_font_allowed("Roboto"))
+        self.assertTrue(manager.is_font_allowed("Open Sans"))
+        self.assertTrue(manager.is_font_allowed("Arial Bold"))
 
     def test_normalize_font_name(self):
         """Test font name normalization."""
@@ -114,37 +119,18 @@ class TestFontMetadataExtractor(unittest.TestCase):
 class TestIntegration(unittest.TestCase):
     """Integration tests combining multiple components."""
 
-    def setUp(self):
-        """Set up integration test fixtures."""
-        # Create a temporary whitelist file
-        self.temp_file = tempfile.NamedTemporaryFile(
-            mode="w", delete=False, suffix=".txt"
-        )
-        self.temp_file.write("roboto\nlato\nopen.*sans\n")
-        self.temp_file.close()
-
-        # Patch the whitelist paths to use our temp file
-        self.whitelist_patcher = patch(
-            "font_analyzer.core.whitelist.WHITELIST_PATHS", [self.temp_file.name]
-        )
-        self.whitelist_patcher.start()
-
-    def tearDown(self):
-        """Clean up after integration tests."""
-        self.whitelist_patcher.stop()
-        os.unlink(self.temp_file.name)
-
+    @patch.dict(os.environ, {"ALLOWED_FONTS": "roboto,lato,open.*sans"}, clear=True)
     def test_whitelist_integration(self):
         """Test that whitelist manager integrates correctly."""
         manager = WhitelistManager()
-
-        # Should load our temp whitelist
+        # Should load from .env file
         self.assertEqual(manager.pattern_count, 3)
 
-        # Test some patterns
+        # Test font validation
         self.assertTrue(manager.is_font_allowed("Roboto"))
+        self.assertTrue(manager.is_font_allowed("lato"))
         self.assertTrue(manager.is_font_allowed("Open Sans"))
-        self.assertFalse(manager.is_font_allowed("Helvetica"))
+        self.assertFalse(manager.is_font_allowed("Times New Roman"))
 
 
 if __name__ == "__main__":

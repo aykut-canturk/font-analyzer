@@ -47,12 +47,9 @@ class FontAnalyzer:
     def __init__(
         self,
         max_workers: int = 4,
-        whitelist_path: Optional[str] = None,
         allowed_fonts: Optional[List[str]] = None,
     ):
-        self.whitelist_manager = WhitelistManager(
-            whitelist_path=whitelist_path, allowed_fonts=allowed_fonts
-        )
+        self.whitelist_manager = WhitelistManager(allowed_fonts=allowed_fonts)
         self.metadata_extractor = FontMetadataExtractor()
         self.web_scraper = WebScraper()
         self.font_downloader = FontDownloader()

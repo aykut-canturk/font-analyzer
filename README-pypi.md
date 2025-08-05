@@ -133,7 +133,6 @@ font-analyzer
 |----------|-------------|---------|
 | `URL` | Website URL to analyze | `https://github.com` |
 | `FONT_PATH` | Path to font file | `./fonts/font.woff` |
-| `WHITELIST_PATH` | Custom whitelist file | `/app/custom-whitelist.yaml` |
 | `ALLOWED_FONTS` | Comma-separated list of allowed font patterns | `Roboto,Open Sans,.*Arial.*` |
 
 ## 👨‍💻 Development
