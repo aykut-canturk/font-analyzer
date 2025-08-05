@@ -7,7 +7,7 @@ where = ["src"]
 
 [project]
 name = "font-analyzer"
-version = "0.0.5"
+version = "0.0.6"
 description = "A tool for detecting and analyzing font metadata from websites and files"
 readme = "README-pypi.md"
 license = "MIT"
