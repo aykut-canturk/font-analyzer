@@ -19,7 +19,7 @@ class WhitelistManager:
         allowed_fonts: Optional[List[str]] = None,
     ):
         self._allowed_patterns: List[str] = []
-        
+
         # Add patterns from direct array parameter
         if allowed_fonts:
             self._add_patterns_from_array(allowed_fonts)
@@ -27,28 +27,34 @@ class WhitelistManager:
             # Load from .env file if no allowed_fonts provided
             self._load_from_env()
 
-        # Log all loaded patterns
-        if self._allowed_patterns:
-            log(
-                f"Loaded {len(self._allowed_patterns)} whitelist patterns: "
-                f"{', '.join(self._allowed_patterns)}"
+        # Raise error if no patterns loaded
+        if not self._allowed_patterns:
+            raise RuntimeError(
+                f"{Fore.RED}WhitelistManager initialized with no patterns. "
+                "Parameters must include allowed_fonts or set ALLOWED_FONTS "
+                f"environment variable.{Style.RESET_ALL}"
             )
+
+        # Log all loaded patterns
+        log(
+            f"Loaded {len(self._allowed_patterns)} whitelist patterns: "
+            f"{', '.join(self._allowed_patterns)}"
+        )
 
     def _load_from_env(self) -> None:
         """Load whitelist patterns from .env file."""
         from dotenv import load_dotenv
-        
+
         # Load .env file
         load_dotenv()
-        
+
         # Get ALLOWED_FONTS from environment
         env_allowed_fonts = os.getenv("ALLOWED_FONTS")
-        
+
         if env_allowed_fonts:
             # Parse comma-separated fonts
             fonts_list = [
-                font.strip() for font in env_allowed_fonts.split(",")
-                if font.strip()
+                font.strip() for font in env_allowed_fonts.split(",") if font.strip()
             ]
             if fonts_list:
                 self._add_patterns_from_array(fonts_list)
