@@ -15,4 +15,4 @@ services:
       # To pass font file path as environment variable:
       # - FONT_PATH=/app/fonts/example.ttf
       # To pass allowed fonts as environment variable:
-      # - ALLOWED_FONTS=Roboto,Open Sans,Arial
+      - ALLOWED_FONTS=Roboto,Lato

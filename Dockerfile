@@ -4,6 +4,10 @@ FROM python:3.13-slim
 # Set working directory
 WORKDIR /app
 
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends
+RUN pip install --upgrade pip setuptools wheel
+
 # Install uv
 RUN pip install --no-cache-dir uv
 
